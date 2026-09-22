@@ -361,6 +361,21 @@ input, textarea { user-select: text; -webkit-user-select: text; }
 .profile-opt.selected { border-color: var(--navy); background: var(--navy); color: var(--white); }
 .profile-opt.hidden-opt { display: none; }
 
+.btn-change-profile {
+  background: none;
+  border: none;
+  color: var(--navy);
+  font-family: inherit;
+  font-size: clamp(13px, 1.8vh, 18px);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  padding: 0.4vh 0;
+  align-self: flex-start;
+}
+.btn-change-profile:active { opacity: 0.6; }
+
 .profile-extra {
   display: flex;
   flex-direction: column;
@@ -1035,6 +1050,8 @@ input, textarea { user-select: text; -webkit-user-select: text; }
       <button type="button" class="profile-opt" data-profile="influencer" onclick="selectProfile('influencer')">Influencer</button>
     </div>
 
+    <button type="button" class="btn-change-profile" id="btn-change-profile" onclick="clearProfileSelection()" style="display:none;">‹ Elegir otro perfil</button>
+
     <div class="profile-extra" id="extra-negocio" style="display:none;">
       <div class="field">
         <input type="text" id="f-tipo-negocio" placeholder=" " oninput="checkProfileForm()" autocomplete="off" inputmode="text" autocapitalize="sentences">
@@ -1423,17 +1440,21 @@ function goToProfile() {
 // ============================================================
 // PROFILE — paso 2
 // ============================================================
+function clearProfileSelection() {
+  currentProfile = null;
+  document.querySelectorAll('.profile-opt').forEach(btn => {
+    btn.classList.remove('selected', 'hidden-opt');
+  });
+  document.getElementById('extra-negocio').style.display     = 'none';
+  document.getElementById('extra-profesional').style.display = 'none';
+  document.getElementById('extra-influencer').style.display  = 'none';
+  document.getElementById('btn-change-profile').style.display = 'none';
+  checkProfileForm();
+}
+
 function selectProfile(key) {
   if (currentProfile === key) {
-    // tocar de nuevo la opción elegida = deshacer selección
-    currentProfile = null;
-    document.querySelectorAll('.profile-opt').forEach(btn => {
-      btn.classList.remove('selected', 'hidden-opt');
-    });
-    document.getElementById('extra-negocio').style.display     = 'none';
-    document.getElementById('extra-profesional').style.display = 'none';
-    document.getElementById('extra-influencer').style.display  = 'none';
-    checkProfileForm();
+    clearProfileSelection();
     return;
   }
 
@@ -1446,6 +1467,7 @@ function selectProfile(key) {
   document.getElementById('extra-negocio').style.display     = key === 'negocio'     ? 'flex' : 'none';
   document.getElementById('extra-profesional').style.display = key === 'profesional' ? 'flex' : 'none';
   document.getElementById('extra-influencer').style.display  = key === 'influencer'  ? 'flex' : 'none';
+  document.getElementById('btn-change-profile').style.display = 'block';
   checkProfileForm();
 }
 
@@ -1620,6 +1642,7 @@ function restart() {
   document.getElementById('btn-profile-next').classList.remove('enabled');
   document.querySelectorAll('.profile-opt').forEach(btn => btn.classList.remove('selected', 'hidden-opt'));
   document.querySelectorAll('.profile-extra').forEach(el => el.style.display = 'none');
+  document.getElementById('btn-change-profile').style.display = 'none';
   currentProfile = null;
   user = {};
 }
