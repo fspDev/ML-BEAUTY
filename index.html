@@ -17,6 +17,8 @@
   --border: #E0E0E0;
   --green: #00A650;
   --red: #E53935;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
@@ -104,7 +106,7 @@ input, textarea { user-select: text; -webkit-user-select: text; }
   font-weight: 800;
   padding: clamp(20px, 3.2vh, 40px) clamp(52px, 12vw, 140px);
   border: none;
-  border-radius: 100px;
+  border-radius: 10px;
   cursor: pointer;
   letter-spacing: 0.5px;
   transition: transform 0.12s, box-shadow 0.12s;
@@ -218,7 +220,7 @@ input, textarea { user-select: text; -webkit-user-select: text; }
 /* ================================================================
    FORM
 ================================================================ */
-#s-form {
+#s-form, #s-profile {
   background: var(--white);
   align-items: center;
   justify-content: center;
@@ -276,56 +278,43 @@ input, textarea { user-select: text; -webkit-user-select: text; }
   flex-direction: column;
   gap: 1.8vh;
 }
-.form-group { display: flex; flex-direction: column; gap: 1.2vh; }
-.form-group label {
-  font-size: clamp(12px, 1.7vh, 19px);
-  font-weight: 800;
-  color: var(--dark);
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-.form-group label .opt { font-weight: 400; text-transform: none; color: #bbb; font-size: 0.85em; }
-.form-group input {
+/* FLOATING LABEL FIELD (inspirado en smoothui.dev/animated-input) */
+.field { position: relative; width: 100%; }
+.field input {
   width: 100%;
-  padding: clamp(16px, 2.8vh, 32px) clamp(18px, 3vw, 34px);
+  padding: clamp(24px, 3.6vh, 34px) clamp(18px, 3vw, 34px) clamp(10px, 1.6vh, 14px);
   font-family: inherit;
   font-size: clamp(18px, 3.2vh, 36px);
   font-weight: 600;
-  border: 2.5px solid var(--border);
-  border-radius: 18px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
   outline: none;
   color: var(--dark);
   background: var(--bg);
   transition: border-color 0.2s, background 0.2s;
 }
-.form-group input:focus { border-color: var(--navy); background: var(--white); }
-.form-group input::placeholder { color: #ccc; font-weight: 500; }
-
-/* YES/NO TOGGLE */
-.yn-group { display: flex; flex-direction: column; gap: 1.2vh; }
-.yn-group label {
-  font-size: clamp(12px, 1.7vh, 19px);
+.field input:focus { border-color: var(--navy); background: var(--white); }
+.field label {
+  position: absolute;
+  left: clamp(18px, 3vw, 34px);
+  top: 50%;
+  transform-origin: left center;
+  transform: translateY(-50%) scale(1);
+  font-size: clamp(18px, 3.2vh, 36px);
+  font-weight: 600;
+  color: #aaa;
+  pointer-events: none;
+  transition: transform 0.24s cubic-bezier(.4,0,.2,1), color 0.24s cubic-bezier(.4,0,.2,1), top 0.24s cubic-bezier(.4,0,.2,1);
+}
+.field input:focus + label,
+.field input:not(:placeholder-shown) + label {
+  top: clamp(15px, 2.3vh, 21px);
+  transform: translateY(-50%) scale(0.6);
+  color: var(--navy);
   font-weight: 800;
-  color: var(--dark);
   letter-spacing: 0.5px;
   text-transform: uppercase;
 }
-.yn-btns { display: flex; gap: clamp(10px, 1.5vw, 20px); }
-.yn-btn {
-  flex: 1;
-  padding: clamp(14px, 2.2vh, 26px);
-  font-family: inherit;
-  font-size: clamp(16px, 2.6vh, 30px);
-  font-weight: 700;
-  border: 2.5px solid var(--border);
-  border-radius: 18px;
-  background: var(--bg);
-  color: var(--gray);
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s, color 0.15s;
-}
-.yn-btn.selected-yes { border-color: var(--green); background: var(--green); color: var(--white); }
-.yn-btn.selected-no  { border-color: var(--red);   background: var(--red);   color: var(--white); }
 
 .btn-primary {
   width: 100%;
@@ -336,7 +325,7 @@ input, textarea { user-select: text; -webkit-user-select: text; }
   font-weight: 800;
   padding: clamp(18px, 3vh, 36px);
   border: none;
-  border-radius: 100px;
+  border-radius: 10px;
   cursor: pointer;
   transition: opacity 0.2s, transform 0.1s;
   opacity: 0.3;
@@ -347,151 +336,40 @@ input, textarea { user-select: text; -webkit-user-select: text; }
 .btn-primary.enabled:active { transform: scale(0.98); }
 
 /* ================================================================
-   QUESTION
+   PROFILE — paso 2
 ================================================================ */
-#s-question {
-  background: var(--white);
-  padding: 4vh 8vw 4vh;
-  gap: 0;
-  overflow: hidden;
-}
-
-.q-top {
+.profile-opts {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4vw;
-  margin-bottom: 2.5vh;
-  padding: 2vh 0 2.5vh;
-  flex-shrink: 0;
-  border-bottom: 2px solid rgba(45,50,119,0.08);
+  flex-direction: column;
+  gap: 1.4vh;
 }
-.q-top .logo-img { width: clamp(160px, 28vw, 380px); height: auto; }
-.q-top .logo-divider { height: clamp(22px, 3.2vh, 42px); background: var(--border); }
-
-.progress-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.2vh;
-  flex-shrink: 0;
-}
-.progress-lbl {
-  font-size: clamp(11px, 1.6vh, 17px);
-  font-weight: 700;
-  color: #bbb;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-}
-.progress-pct {
-  font-size: clamp(11px, 1.6vh, 17px);
-  font-weight: 800;
-  color: var(--navy);
-}
-.progress-track {
-  height: 6px;
+.profile-opt {
+  width: 100%;
   background: var(--bg);
+  border: 1.5px solid var(--border);
   border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 3.5vh;
-  flex-shrink: 0;
-}
-.progress-fill {
-  height: 100%;
-  background: var(--yellow);
-  border-radius: 10px;
-  transition: width 0.4s ease;
-}
-
-.q-num {
-  font-size: clamp(11px, 1.6vh, 17px);
-  font-weight: 800;
-  color: var(--navy);
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  margin-bottom: 1.8vh;
-  flex-shrink: 0;
-}
-.q-text {
-  font-size: clamp(22px, 4vh, 50px);
-  font-weight: 900;
-  color: var(--dark);
-  line-height: 1.2;
-  margin-bottom: 3.5vh;
-  letter-spacing: -0.5px;
-  flex-shrink: 0;
-}
-
-.opts-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(12px, 2vh, 26px);
-  flex: 1;
-}
-.opts-grid.two-opts { grid-template-columns: 1fr; }
-
-.opt-btn {
-  background: var(--bg);
-  border: 3px solid var(--border);
-  border-radius: clamp(14px, 2vh, 24px);
-  padding: clamp(18px, 3vh, 38px) clamp(14px, 2.5vw, 30px);
+  padding: clamp(16px, 2.6vh, 28px) clamp(18px, 3vw, 34px);
   font-family: inherit;
-  font-size: clamp(20px, 3.4vh, 42px);
+  font-size: clamp(17px, 2.8vh, 30px);
   font-weight: 700;
-  color: var(--gray);
+  color: var(--dark);
+  text-align: left;
   cursor: pointer;
-  transition: border-color 0.14s, background 0.14s, transform 0.1s;
-  text-align: center;
-  line-height: 1.3;
-  min-height: clamp(80px, 13vh, 150px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  transition: border-color 0.14s, background 0.14s, color 0.14s, transform 0.1s;
 }
-.opt-btn:active { transform: scale(0.96); }
-.opt-btn:disabled { cursor: default; transform: none; }
-.opt-btn.sel    { border-color: var(--navy);  background: var(--navy);  color: var(--white); }
-.opt-btn.correct{ border-color: var(--green); background: var(--green); color: var(--white); }
-.opt-btn.wrong  { border-color: var(--red);   background: var(--red);   color: var(--white); }
+.profile-opt:active { transform: scale(0.98); }
+.profile-opt.selected { border-color: var(--navy); background: var(--navy); color: var(--white); }
 
-.wrong-reveal {
-  display: none;
-  align-items: center;
-  gap: clamp(8px, 1.5vw, 18px);
-  background: rgba(255,255,255,0.92);
-  border: 2px solid var(--red);
-  border-radius: 14px;
-  padding: clamp(12px, 1.8vh, 20px) clamp(16px, 3vw, 28px);
-  margin-top: clamp(12px, 1.8vh, 20px);
+.profile-extra {
+  display: flex;
+  flex-direction: column;
+  gap: 1.8vh;
   animation: fadeUp .3s ease both;
-  flex-shrink: 0;
-}
-.wrong-reveal-label {
-  font-size: clamp(11px, 1.4vh, 16px);
-  font-weight: 700;
-  color: var(--red);
-  text-transform: uppercase;
-  letter-spacing: .5px;
-  white-space: nowrap;
-}
-.wrong-reveal-answer {
-  font-size: clamp(13px, 1.9vh, 22px);
-  font-weight: 800;
-  color: var(--navy);
 }
 
 /* ================================================================
-   GAME OVER (wrong answer)
+   RESULT SCREENS (shared classes used by s-noprize)
 ================================================================ */
-#s-gameover {
-  background: var(--navy);
-  align-items: center;
-  justify-content: center;
-  padding: 7vh 10vw;
-  text-align: center;
-  gap: 4vh;
-}
-
 .result-icon { font-size: clamp(60px, 11vh, 120px); flex-shrink: 0; }
 
 .result-big-title {
@@ -508,37 +386,6 @@ input, textarea { user-select: text; -webkit-user-select: text; }
   color: rgba(255,255,255,0.55);
   line-height: 1.5;
   flex-shrink: 0;
-}
-
-.correct-reveal-box {
-  background: rgba(255,230,0,0.1);
-  border: 2px solid rgba(255,230,0,0.35);
-  border-radius: clamp(16px, 2.5vh, 28px);
-  padding: clamp(20px, 3.5vh, 44px) clamp(24px, 5vw, 60px);
-  max-width: 82vw;
-  flex-shrink: 0;
-}
-.correct-reveal-label {
-  font-size: clamp(11px, 1.6vh, 17px);
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--yellow);
-  margin-bottom: 1.4vh;
-}
-.correct-reveal-q {
-  font-size: clamp(13px, 1.9vh, 22px);
-  font-weight: 500;
-  color: rgba(255,255,255,0.45);
-  margin-bottom: 1.8vh;
-  font-style: italic;
-  line-height: 1.4;
-}
-.correct-reveal-answer {
-  font-size: clamp(22px, 3.8vh, 46px);
-  font-weight: 900;
-  color: var(--yellow);
-  line-height: 1.2;
 }
 
 /* ================================================================
@@ -684,123 +531,58 @@ input, textarea { user-select: text; -webkit-user-select: text; }
 .memo-card.loser-card  .memo-card-front { opacity: 0.35; }
 
 /* ================================================================
-   BOX GAME
+   RULETA
 ================================================================ */
-#s-boxes {
-  background: linear-gradient(160deg, #18105a 0%, #2D3277 55%, #18105a 100%);
+#s-roulette {
+  background: var(--white);
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 5vh 6vw;
   text-align: center;
   overflow: hidden;
 }
 
-.boxes-header-logos {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4vw;
-  flex-shrink: 0;
-}
-.boxes-header-logos .logo-img {
-  height: clamp(26px, 3.8vh, 48px);
-  filter: brightness(0) invert(1);
-  opacity: 0.85;
-}
-.boxes-header-logos .logo-divider { height: clamp(22px, 3.2vh, 42px); background: rgba(255,255,255,0.2); }
-
-.boxes-main {
+.roulette-main {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4vh;
-}
-.boxes-title {
-  font-size: clamp(30px, 5.5vh, 66px);
-  font-weight: 900;
-  color: var(--white);
-  letter-spacing: -0.5px;
-  line-height: 1.1;
-}
-.boxes-sub {
-  font-size: clamp(15px, 2.4vh, 28px);
-  font-weight: 500;
-  color: rgba(255,255,255,0.55);
+  gap: 3vh;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
-.boxes-row {
-  display: flex;
-  gap: clamp(14px, 3vw, 44px);
-  align-items: center;
-  justify-content: center;
-}
+#s-roulette .top-logos .logo-img { height: clamp(48px, 7vh, 90px); }
 
-.box-card {
-  width: clamp(150px, 25vw, 290px);
-  height: clamp(190px, 30vh, 360px);
-  background: rgba(255,255,255,0.07);
-  border: 3px solid rgba(255,230,0,0.22);
-  border-radius: clamp(16px, 2.5vh, 30px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: border-color 0.14s, background 0.14s, transform 0.12s, opacity 0.3s;
-  gap: 2.2vh;
+.wheel-wrap {
   position: relative;
-  overflow: hidden;
+  width: clamp(320px, 66vh, 820px);
+  aspect-ratio: 1;
 }
-.box-card::before {
-  content: '';
+.wheel-pointer {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255,230,0,0.06) 0%, transparent 60%);
-  pointer-events: none;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 28px solid transparent;
+  border-right: 28px solid transparent;
+  border-top: 48px solid var(--navy);
+  z-index: 5;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
 }
-.box-card:active { transform: scale(0.95); }
-.box-card.disabled { pointer-events: none; cursor: default; }
-
-.box-img {
-  width: clamp(120px, 88%, 250px);
-  height: auto;
-  object-fit: contain;
+.wheel {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
   display: block;
-  transition: opacity 0.3s, transform 0.3s;
-  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.35));
-}
-.box-card.winner .box-img { filter: drop-shadow(0 4px 18px rgba(255,230,0,0.6)) brightness(1.08); }
-.box-card.loser  .box-img { opacity: 0.25; }
-.box-lbl {
-  font-size: clamp(14px, 2.2vh, 26px);
-  font-weight: 800;
-  color: rgba(255,255,255,0.45);
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  box-shadow: 0 16px 50px rgba(45,50,119,0.18), 0 2px 0 rgba(45,50,119,0.06);
+  transition: transform 4.5s cubic-bezier(.15,.66,.18,1);
 }
 
-.box-card.winner {
-  background: var(--yellow);
-  border-color: var(--yellow);
-  animation: boxWinPop 0.5s cubic-bezier(.36,.07,.19,.97);
-}
-.box-card.winner .box-lbl { color: var(--navy); }
-
-.box-card.loser {
-  opacity: 0.35;
-  border-color: rgba(255,255,255,0.1);
-  background: rgba(255,255,255,0.02);
-}
-
-@keyframes boxWinPop {
-  0%   { transform: scale(1) rotate(0deg); }
-  20%  { transform: scale(0.9) rotate(-4deg); }
-  50%  { transform: scale(1.1) rotate(3deg); }
-  75%  { transform: scale(0.97) rotate(-1deg); }
-  100% { transform: scale(1) rotate(0deg); }
-}
+#btn-spin:disabled { opacity: 0.55; box-shadow: none; cursor: default; }
 
 /* ================================================================
    PRIZE (won)
@@ -837,6 +619,9 @@ input, textarea { user-select: text; -webkit-user-select: text; }
   height: auto;
   display: block;
   filter: drop-shadow(0 6px 24px rgba(45,50,119,0.18));
+  opacity: 0;
+  transform: scale(0.92);
+  animation: prizeLogoIn 550ms var(--ease-out) 80ms both;
 }
 .prize-eyebrow {
   font-size: clamp(13px, 2vh, 22px);
@@ -844,6 +629,9 @@ input, textarea { user-select: text; -webkit-user-select: text; }
   letter-spacing: 3px;
   text-transform: uppercase;
   color: rgba(45,50,119,0.55);
+  opacity: 0;
+  transform: translateY(10px);
+  animation: prizeFadeUp 420ms var(--ease-out) 300ms both;
 }
 .prize-title {
   font-size: clamp(46px, 9.5vh, 110px);
@@ -852,13 +640,79 @@ input, textarea { user-select: text; -webkit-user-select: text; }
   letter-spacing: -2px;
   line-height: 0.95;
 }
+.prize-title .pop-char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(18px) scale(0.4);
+  animation: popChar 520ms var(--ease-out-back) both;
+}
+@keyframes popChar {
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
 .prize-desc {
   font-size: clamp(17px, 2.8vh, 34px);
   font-weight: 700;
   color: rgba(0,0,0,0.6);
   max-width: 76vw;
   line-height: 1.45;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: prizeFadeUp 420ms var(--ease-out) 680ms both;
 }
+.prize-won {
+  font-size: clamp(20px, 3.2vh, 38px);
+  font-weight: 800;
+  color: var(--navy);
+  max-width: 76vw;
+  line-height: 1.3;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: prizeFadeUp 420ms var(--ease-out) 480ms both;
+}
+
+@keyframes prizeLogoIn {
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes prizeFadeUp {
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Ráfaga geométrica minimalista — una sola vez al ganar */
+.prize-fx {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.prize-fx .spark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--w, 6px);
+  height: var(--h, 22px);
+  background: var(--c, var(--navy));
+  border-radius: 2px;
+  opacity: 0;
+  transform: translate(-50%, -50%) rotate(var(--r, 0deg)) translateY(0) scale(0.5);
+  animation: sparkBurst 1000ms var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+@keyframes sparkBurst {
+  0%   { opacity: 0; transform: translate(-50%, -50%) rotate(var(--r, 0deg)) translateY(0) scale(0.5); }
+  14%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -50%) rotate(var(--r, 0deg)) translateY(var(--dist, -160px)) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prize-brand-logo, .prize-eyebrow, .prize-title, .prize-won, .prize-desc {
+    animation: prizeFadeSimple 300ms ease both;
+    transform: none !important;
+  }
+  .prize-title .pop-char { opacity: 1 !important; transform: none !important; animation: none !important; }
+  .prize-fx { display: none; }
+}
+@keyframes prizeFadeSimple { to { opacity: 1; } }
 
 /* ================================================================
    NO PRIZE (lost boxes)
@@ -1016,26 +870,11 @@ input, textarea { user-select: text; -webkit-user-select: text; }
   margin-top: -40px; margin-left: -40px;
 }
 
-/* Question stagger */
-.q-opt-anim { animation: fadeUp .35s ease both; }
-
-/* Box float while waiting */
-.box-card.floating { animation: floatBob 2.8s ease-in-out infinite; }
-.box-card:nth-child(2).floating { animation-delay: .3s; }
-.box-card:nth-child(3).floating { animation-delay: .6s; }
-
 /* Memo card entrance */
 .memo-card.card-enter { animation: scaleIn .3s ease both; }
 
 /* Game select cards */
 .gs-card-anim { animation: fadeUp .4s ease both; }
-
-/* Answer correct/wrong */
-.opt-btn.correct { animation: correctPop .35s ease; }
-.opt-btn.wrong   { animation: shake .45s ease; }
-
-/* Prize entrance */
-.prize-pop { animation: bounceIn .7s .1s ease both; }
 
 /* Countdown pulse when low */
 .countdown-fill.urgent { animation: countdownPulse .7s ease-in-out infinite; }
@@ -1043,7 +882,6 @@ input, textarea { user-select: text; -webkit-user-select: text; }
 /* Hover lift on game-select cards */
 @media (hover:hover) {
   .game-select-card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(45,50,119,.15); }
-  .box-card:hover { border-color: rgba(255,230,0,.7); background: rgba(255,255,255,.13); transform: translateY(-6px) scale(1.03); }
 }
 
 /* ================================================================
@@ -1062,24 +900,13 @@ input, textarea { user-select: text; -webkit-user-select: text; }
   #s-form { padding: 5vh 7vw; }
   .top-logos .logo-img { height: clamp(34px, 6vh, 50px); }
   .section-title { font-size: clamp(30px, 5.5vh, 44px); }
-  .form-group input { font-size: clamp(17px, 2.6vh, 22px); padding: clamp(15px, 2.2vh, 20px) 18px; }
-
-  /* Question — answers stack in a single column for readability */
-  .q-top .logo-img { width: clamp(150px, 60vw, 260px); }
-  .opts-grid { grid-template-columns: 1fr; gap: clamp(10px, 1.6vh, 16px); }
-  .opt-btn { min-height: clamp(54px, 9vh, 78px); }
-
-  /* Game select — stack the two cards vertically */
-  .game-select-row { flex-direction: column; gap: 16px; margin-top: 2vh; }
+  .field input { font-size: clamp(17px, 2.6vh, 22px); padding: clamp(20px, 2.8vh, 26px) 18px clamp(9px, 1.4vh, 12px); }
+  .field label { font-size: clamp(17px, 2.6vh, 22px); left: 18px; }
   .game-select-card { flex-direction: row; padding: 20px 22px; gap: 18px; text-align: left; align-items: center; }
   .gs-icon { font-size: clamp(44px, 8vh, 60px); flex-shrink: 0; }
   .gs-text-wrap { flex: 1; }
   .gs-name { font-size: clamp(22px, 3.4vh, 30px); }
   .gs-desc { font-size: clamp(13px, 1.8vh, 16px); }
-
-  /* Boxes — fit 3 across on narrow screens */
-  .boxes-row { gap: 10px; }
-  .box-card { width: clamp(92px, 28vw, 130px); height: clamp(140px, 26vh, 200px); }
 
   /* Memotest — use more width */
   .memo-grid { width: min(90vw, 90vw); gap: 8px; }
@@ -1137,7 +964,7 @@ input, textarea { user-select: text; -webkit-user-select: text; }
 
   <button class="btn-huge pulsing anim-welcome-btn" id="btn-participar" onclick="goTo('s-form')">¡PARTICIPAR!</button>
 
-  <p class="welcome-disclaimer anim-welcome-sub">*Respondé 3 preguntas sobre Mercado Libre y ganá tu premio</p>
+  <p class="welcome-disclaimer anim-welcome-sub">*Completá tus datos, girá la ruleta y ganá tu premio</p>
 </div>
 
 <!-- ============================================================
@@ -1149,118 +976,95 @@ input, textarea { user-select: text; -webkit-user-select: text; }
         >
   </div>
 
-  <div class="section-eyebrow">Paso 1</div>
   <div class="section-title">Tus datos</div>
   <div class="yellow-bar"></div>
   <p class="section-sub">Para registrar tu participación</p>
 
   <div class="form-fields">
-    <div class="form-group">
-      <label>Nombre</label>
-      <input type="text" id="f-nombre" placeholder="Ej: Martina" oninput="checkForm()" autocomplete="off">
+    <div class="field">
+      <input type="text" id="f-nombre" placeholder=" " oninput="checkForm()" autocomplete="off" inputmode="text" autocapitalize="words">
+      <label for="f-nombre">Nombre</label>
     </div>
-    <div class="form-group">
-      <label>Teléfono / WhatsApp</label>
-      <input type="tel" id="f-tel" placeholder="Ej: 11 5555-1234" oninput="checkForm()" autocomplete="off">
+    <div class="field">
+      <input type="tel" id="f-tel" placeholder=" " oninput="checkForm()" autocomplete="off" inputmode="tel">
+      <label for="f-tel">Teléfono</label>
     </div>
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" id="f-email" placeholder="tu@email.com" oninput="checkForm()" autocomplete="off">
+    <div class="field">
+      <input type="email" id="f-email" placeholder=" " oninput="checkForm()" autocomplete="off" inputmode="email" autocapitalize="off" autocorrect="off">
+      <label for="f-email">Mail</label>
     </div>
-    <div class="form-group">
-      <label>Profesión / Oficio</label>
-      <input type="text" id="f-profesion" placeholder="Ej: Electricista, Plomero..." oninput="checkForm()" autocomplete="off">
-    </div>
-    <div class="form-group">
-      <label>Empresa</label>
-      <input type="text" id="f-empresa" placeholder="Ej: Constructora XYZ" oninput="checkForm()" autocomplete="off">
-    </div>
-    <div class="yn-group">
-      <label>¿Vendés a través de Mercado Libre?</label>
-      <div class="yn-btns">
-        <button type="button" class="yn-btn" id="yn-si" onclick="selectYN('si')">✔ Sí</button>
-        <button type="button" class="yn-btn" id="yn-no" onclick="selectYN('no')">✖ No</button>
-      </div>
-    </div>
-    <button class="btn-primary" id="btn-form-next" onclick="startRound()">Continuar →</button>
+    <button class="btn-primary" id="btn-form-next" onclick="goToProfile()">Continuar →</button>
   </div>
 </div>
 
 <!-- ============================================================
-     QUESTION
+     PROFILE — paso 2
 ============================================================ -->
-<div class="screen" id="s-question">
-  <div class="q-top">
-    <img class="logo-img" src="images/logo-ml.svg" alt="ML"
-        >
+<div class="screen" id="s-profile">
+  <div class="top-logos">
+    <img class="logo-img" src="images/logo-ml.svg" alt="ML">
   </div>
 
-  <div class="progress-row">
-    <span class="progress-lbl" id="q-prog-lbl">Pregunta 1 de 3</span>
-    <span class="progress-pct" id="q-pct">0%</span>
-  </div>
-  <div class="progress-track">
-    <div class="progress-fill" id="q-fill" style="width:0%"></div>
-  </div>
+  <div class="section-title">Tu perfil</div>
+  <div class="yellow-bar"></div>
+  <p class="section-sub">¿Con qué perfil te identificás?</p>
 
-  <div class="q-num" id="q-num">PREGUNTA 1</div>
-  <div class="q-text" id="q-text"></div>
-  <div class="opts-grid" id="q-opts"></div>
-  <div class="wrong-reveal" id="wrong-reveal" style="display:none;">
-    <span class="wrong-reveal-label">Respuesta correcta:</span>
-    <span class="wrong-reveal-answer" id="wrong-reveal-answer"></span>
+  <div class="form-fields">
+    <div class="profile-opts">
+      <button type="button" class="profile-opt" data-profile="consumidor" onclick="selectProfile('consumidor')">Consumidor Final</button>
+      <button type="button" class="profile-opt" data-profile="negocio" onclick="selectProfile('negocio')">Negocio / Empresa</button>
+      <button type="button" class="profile-opt" data-profile="profesional" onclick="selectProfile('profesional')">Profesional</button>
+      <button type="button" class="profile-opt" data-profile="influencer" onclick="selectProfile('influencer')">Influencer</button>
+    </div>
+
+    <div class="profile-extra" id="extra-negocio" style="display:none;">
+      <div class="field">
+        <input type="text" id="f-tipo-negocio" placeholder=" " oninput="checkProfileForm()" autocomplete="off" inputmode="text" autocapitalize="sentences">
+        <label for="f-tipo-negocio">Tipo de negocio</label>
+      </div>
+      <div class="field">
+        <input type="text" id="f-nombre-negocio" placeholder=" " oninput="checkProfileForm()" autocomplete="off" inputmode="text" autocapitalize="words">
+        <label for="f-nombre-negocio">Nombre del negocio</label>
+      </div>
+    </div>
+
+    <div class="profile-extra" id="extra-profesional" style="display:none;">
+      <div class="field">
+        <input type="text" id="f-rubro" placeholder=" " oninput="checkProfileForm()" autocomplete="off" inputmode="text" autocapitalize="sentences">
+        <label for="f-rubro">Rubro</label>
+      </div>
+    </div>
+
+    <div class="profile-extra" id="extra-influencer" style="display:none;">
+      <div class="field">
+        <input type="text" id="f-red-social" placeholder=" " oninput="checkProfileForm()" autocomplete="off" inputmode="text" autocapitalize="off">
+        <label for="f-red-social">Perfil red social</label>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="btn-profile-next" onclick="startRound()">Continuar →</button>
   </div>
 </div>
 
 <!-- ============================================================
-     GAME OVER — respuesta incorrecta
+     RULETA
 ============================================================ -->
-<div class="screen" id="s-gameover">
-  <div class="result-icon">😔</div>
-  <div class="result-big-title">¡Gracias por<br>participar!</div>
-  <p class="result-sub">Casi llegás... La respuesta correcta era:</p>
-
-  <div class="correct-reveal-box">
-    <div class="correct-reveal-label">Respuesta correcta</div>
-    <div class="correct-reveal-q" id="go-q-text"></div>
-    <div class="correct-reveal-answer" id="go-answer"></div>
+<div class="screen" id="s-roulette">
+  <div class="top-logos">
+    <img class="logo-img" src="images/logo-ml.svg" alt="ML">
   </div>
 
-  <div class="countdown-wrap">
-    <div class="countdown-lbl" id="go-cd-lbl">Volviendo al inicio...</div>
-    <div class="countdown-track">
-      <div class="countdown-fill" id="go-cd-fill"></div>
+  <div class="roulette-main">
+    <div class="section-title">¡Girá la ruleta!</div>
+    <div class="yellow-bar"></div>
+    <p class="section-sub" id="roulette-sub">Tocá el botón y descubrí tu resultado</p>
+
+    <div class="wheel-wrap">
+      <div class="wheel-pointer"></div>
+      <img class="wheel" id="wheel" src="images/ruleta.png" alt="Ruleta Mercado Libre">
     </div>
-  </div>
-</div>
 
-<!-- ============================================================
-     BOX GAME
-============================================================ -->
-<div class="screen" id="s-boxes">
-  <div class="boxes-header-logos">
-    <img class="logo-img" src="images/logo-ml.svg" alt="ML"
-        >
-  </div>
-
-  <div class="boxes-main">
-    <div class="boxes-title" id="boxes-title">¡Elegí tu caja!</div>
-    <p class="boxes-sub" id="boxes-sub">Dos de las tres cajas tienen el premio. ¿Cuál elegís?</p>
-
-    <div class="boxes-row">
-      <div class="box-card" id="box-0" onclick="pickBox(0)">
-        <img class="box-img" src="images/caja.png" alt="Caja 1">
-        <div class="box-lbl">Caja 1</div>
-      </div>
-      <div class="box-card" id="box-1" onclick="pickBox(1)">
-        <img class="box-img" src="images/caja.png" alt="Caja 2">
-        <div class="box-lbl">Caja 2</div>
-      </div>
-      <div class="box-card" id="box-2" onclick="pickBox(2)">
-        <img class="box-img" src="images/caja.png" alt="Caja 3">
-        <div class="box-lbl">Caja 3</div>
-      </div>
-    </div>
+    <button class="btn-huge" id="btn-spin" onclick="spinWheel()">¡GIRAR!</button>
   </div>
 </div>
 
@@ -1268,11 +1072,12 @@ input, textarea { user-select: text; -webkit-user-select: text; }
      PRIZE — ganó
 ============================================================ -->
 <div class="screen" id="s-prize" onclick="stopConfetti(); restart(); goTo('s-welcome'); resetIdle();">
-<canvas id="confetti-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;background:transparent;"></canvas>
-  <div class="prize-main prize-pop" style="position:relative;z-index:1;">
-    <img class="prize-brand-logo" src="images/logo-mlc.svg" alt="Mercado Libre">
+<div id="prize-fx" class="prize-fx"></div>
+  <div class="prize-main" style="position:relative;z-index:1;">
+    <img class="prize-brand-logo" src="images/logo-ml.svg" alt="Mercado Libre Negocios">
     <div class="prize-eyebrow">¡Felicitaciones!</div>
-    <div class="prize-title" id="prize-name">¡GANASTE!</div>
+    <div class="prize-title" id="prize-name">¡Ganaste!</div>
+    <p class="prize-won" id="prize-won-name">Merchandising de Mercado Libre</p>
     <p class="prize-desc" id="prize-desc">Acercate al stand para reclamar tu premio.</p>
   </div>
 
@@ -1330,9 +1135,8 @@ input, textarea { user-select: text; -webkit-user-select: text; }
               <th>Nombre</th>
               <th>Teléfono</th>
               <th>Email</th>
-              <th>Profesión</th>
-              <th>Empresa</th>
-              <th>Vende ML</th>
+              <th>Perfil</th>
+              <th>Detalle</th>
               <th>Resultado</th>
             </tr>
           </thead>
@@ -1353,13 +1157,6 @@ input, textarea { user-select: text; -webkit-user-select: text; }
         <div class="cfg-row">
           <label class="cfg-label">Tiempo de inactividad antes del screensaver (segundos)</label>
           <input type="number" class="cfg-input" id="cfg-idle-timeout" min="30" max="3600" placeholder="180">
-        </div>
-        <div class="cfg-row">
-          <label class="cfg-label">Modo del juego de cajas</label>
-          <select class="cfg-input" id="cfg-box-mode">
-            <option value="event">Evento — 2 cajas ganadoras + 2da chance garantizada</option>
-            <option value="classic">Clásico — 1 caja ganadora, sin segunda chance</option>
-          </select>
         </div>
         <div class="cfg-row">
           <label class="cfg-label">Límite de premios por día</label>
@@ -1389,107 +1186,47 @@ input, textarea { user-select: text; -webkit-user-select: text; }
 
 <script>
 // ============================================================
-// PREGUNTAS
+// RULETA — segmentos (coinciden con images/ruleta.png, 8 divisiones
+// de 45° cada una, ángulo medido en sentido horario desde arriba)
 // ============================================================
-const POOL = [
-  {
-    text: "¿Cuál es la vertical que más unidades vendió en Mercado Libre durante 2026?",
-    options: [
-      { text: "Construcción & Industria", correct: true },
-      { text: "Fashion", correct: false },
-      { text: "Tecnología", correct: false },
-      { text: "Consumo Masivo", correct: false }
-    ]
-  },
-  {
-    text: "¿Cuántas visitas recibe por mes la categoría de Construcción & Industria?",
-    options: [
-      { text: "+ 11 Millones", correct: true },
-      { text: "+ 9 Millones", correct: false },
-      { text: "+ 18 Millones", correct: false },
-      { text: "+23 Millones", correct: false }
-    ]
-  },
-  {
-    text: "¿Cuántos baldes de pintura se venden por Mercado Libre por minuto?",
-    options: [
-      { text: "5", correct: true },
-      { text: "9", correct: false },
-      { text: "3", correct: false },
-      { text: "12", correct: false }
-    ]
-  },
-  {
-    text: "¿Cuántos juegos de griferías se venden por mes en Mercado Libre?",
-    options: [
-      { text: "115 mil", correct: true },
-      { text: "90 mil", correct: false },
-      { text: "43 mil", correct: false },
-      { text: "150 mil", correct: false }
-    ]
-  },
-  {
-    text: "¿En cuántos países opera Mercado Libre en la actualidad?",
-    options: [
-      { text: "11", correct: false },
-      { text: "8", correct: false },
-      { text: "18", correct: true },
-      { text: "20", correct: false }
-    ]
-  },
-  {
-    text: "¿Cuál es la categoría que más visitas recibe dentro de Mercado Libre?",
-    options: [
-      { text: "Pinturas", correct: true },
-      { text: "Pisos y Revestimiento", correct: false },
-      { text: "Electricidad", correct: false },
-      { text: "Plomería", correct: false }
-    ]
-  },
-  {
-    text: "¿Qué porcentaje de compradores de Construcción son empresas que compran en volumen?",
-    options: [
-      { text: "3%", correct: false },
-      { text: "16%", correct: true },
-      { text: "21%", correct: false },
-      { text: "43%", correct: false }
-    ]
-  },
-  {
-    text: "¿Cuántos compradores ÚNICOS tuvo en 2026 la categoría de Construcción & Industrias?",
-    options: [
-      { text: "5.7 Millones", correct: true },
-      { text: "4.5 Millones", correct: false }
-    ]
-  },
-  {
-    text: "¿Qué porcentaje de todos sus pedidos gestiona la Logística de Meli?",
-    options: [
-      { text: "96%", correct: true },
-      { text: "92%", correct: false },
-      { text: "86%", correct: false },
-      { text: "98%", correct: false }
-    ]
-  },
-  {
-    text: "¿Qué porcentaje de las ventas son con cuotas sin interés?",
-    options: [
-      { text: "18%", correct: true },
-      { text: "25%", correct: false },
-      { text: "21%", correct: false },
-      { text: "47%", correct: false }
-    ]
-  }
+const WHEEL_SEGMENTS = [
+  { angle: 0,   result: 'ganaste' },  // beige
+  { angle: 45,  result: 'tira'    },  // rosa
+  { angle: 90,  result: 'gracias' },  // malva
+  { angle: 135, result: 'ganaste' },  // naranja
+  { angle: 180, result: 'gracias' },  // rosa viejo
+  { angle: 225, result: 'tira'    },  // marrón
+  { angle: 270, result: 'ganaste' },  // magenta
+  { angle: 315, result: 'gracias' }   // verde-amarillo
 ];
+
+// Probabilidades del 1er giro: la mayoría cae en "tirá de nuevo"
+const SPIN1_PROBS = { tira: 0.75, ganaste: 0.20, gracias: 0.05 };
+// Probabilidades del 2do giro (si tocó "tirá de nuevo"): casi siempre premio
+const SPIN2_PROBS = { ganaste: 0.93, gracias: 0.07 };
+
+function pickCategory(probs) {
+  const r = Math.random();
+  let acc = 0;
+  for (const cat in probs) {
+    acc += probs[cat];
+    if (r < acc) return cat;
+  }
+  return Object.keys(probs)[0];
+}
+
+function pickSegment(result) {
+  const candidates = WHEEL_SEGMENTS.filter(s => s.result === result);
+  return candidates[Math.floor(Math.random() * candidates.length)];
+}
 
 // ============================================================
 // CONFIG & STATE
 // ============================================================
 let cfg = JSON.parse(localStorage.getItem('batev_cfg')) || {};
-cfg.prize      = cfg.prize      || { name: "¡Ganaste Merchandising de Mercado Libre!", description: "Acercate al stand para reclamar tu premio." };
+cfg.prize      = cfg.prize      || { name: "Merchandising de Mercado Libre", description: "Acercate al stand para reclamar tu premio." };
 cfg.dailyLimit = cfg.dailyLimit || 125;
 cfg.totalLimit = cfg.totalLimit || 499;
-cfg.boxMode      = cfg.boxMode      || 'event';
 cfg.idleTimeout  = cfg.idleTimeout  || 180;
 
 // ── Prize tracking ────────────────────────────────────────────
@@ -1511,26 +1248,17 @@ function recordPrize() {
   localStorage.setItem('prizes_total', String(totalPrizes));
 }
 
-let round = [];             // 3 preguntas seleccionadas y barajadas
-let qIdx  = 0;              // pregunta actual (0-2)
 let user  = {};             // datos del participante
-let winBoxes = [];          // índices de cajas ganadoras
-let boxSecondChance = false; // true cuando es la segunda oportunidad garantizada
+let currentProfile = null;  // 'consumidor' | 'negocio' | 'profesional' | 'influencer'
+let wheelRotation = 0;      // rotación acumulada de la ruleta
+let spinning = false;       // true mientras la ruleta gira
+let spinAttempt = 0;        // 1 = primer giro, 2 = segunda oportunidad
 let idleTimer = null;
 let cdInterval = null;      // intervalo del countdown activo
 
 // ============================================================
 // UTILITIES
 // ============================================================
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
 function goTo(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -1655,178 +1383,126 @@ function initSSControls() {
 }
 
 // ============================================================
-// FORM
+// FORM — paso 1
 // ============================================================
-let vendeMeli = null; // 'si' | 'no' | null
-
-function selectYN(val) {
-  vendeMeli = val;
-  document.getElementById('yn-si').className = 'yn-btn' + (val === 'si' ? ' selected-yes' : '');
-  document.getElementById('yn-no').className = 'yn-btn' + (val === 'no' ? ' selected-no'  : '');
-  checkForm();
-}
-
 function checkForm() {
-  const n   = document.getElementById('f-nombre').value.trim();
-  const t   = document.getElementById('f-tel').value.trim();
-  const e   = document.getElementById('f-email').value.trim();
-  const p   = document.getElementById('f-profesion').value.trim();
-  const emp = document.getElementById('f-empresa').value.trim();
+  const n = document.getElementById('f-nombre').value.trim();
+  const t = document.getElementById('f-tel').value.trim();
+  const e = document.getElementById('f-email').value.trim();
   document.getElementById('btn-form-next').classList.toggle('enabled',
-    n.length > 1 && t.length > 5 && e.length > 3 && p.length > 1 && emp.length > 1 && vendeMeli !== null);
+    n.length > 1 && t.length > 5 && e.length > 3);
+}
+
+function goToProfile() {
+  user = {
+    nombre: document.getElementById('f-nombre').value.trim(),
+    tel:    document.getElementById('f-tel').value.trim(),
+    email:  document.getElementById('f-email').value.trim()
+  };
+  goTo('s-profile');
 }
 
 // ============================================================
-// ROUND
+// PROFILE — paso 2
+// ============================================================
+function selectProfile(key) {
+  currentProfile = key;
+  document.querySelectorAll('.profile-opt').forEach(btn => {
+    btn.classList.toggle('selected', btn.dataset.profile === key);
+  });
+  document.getElementById('extra-negocio').style.display     = key === 'negocio'     ? 'flex' : 'none';
+  document.getElementById('extra-profesional').style.display = key === 'profesional' ? 'flex' : 'none';
+  document.getElementById('extra-influencer').style.display  = key === 'influencer'  ? 'flex' : 'none';
+  checkProfileForm();
+}
+
+function checkProfileForm() {
+  let ok = currentProfile !== null;
+  if (currentProfile === 'negocio') {
+    ok = ok
+      && document.getElementById('f-tipo-negocio').value.trim().length > 1
+      && document.getElementById('f-nombre-negocio').value.trim().length > 1;
+  } else if (currentProfile === 'profesional') {
+    ok = ok && document.getElementById('f-rubro').value.trim().length > 1;
+  } else if (currentProfile === 'influencer') {
+    ok = ok && document.getElementById('f-red-social').value.trim().length > 1;
+  }
+  document.getElementById('btn-profile-next').classList.toggle('enabled', ok);
+}
+
+const PROFILE_LABELS = {
+  consumidor:  'Consumidor Final',
+  negocio:     'Negocio/Empresa',
+  profesional: 'Profesional',
+  influencer:  'Influencer'
+};
+
+// ============================================================
+// START → arma el usuario completo y entra a la ruleta
 // ============================================================
 function startRound() {
-  user = {
-    nombre:    document.getElementById('f-nombre').value.trim(),
-    tel:       document.getElementById('f-tel').value.trim(),
-    email:     document.getElementById('f-email').value.trim(),
-    profesion: document.getElementById('f-profesion').value.trim(),
-    empresa:   document.getElementById('f-empresa').value.trim(),
-    vendeMeli: vendeMeli === 'si' ? 'Sí' : 'No'
-  };
-  round = shuffle(POOL).slice(0, 3).map(q => ({
-    text: q.text,
-    options: shuffle(q.options)
-  }));
-  qIdx = 0;
-  renderQuestion();
-  goTo('s-question');
-}
-
-// ============================================================
-// QUESTION RENDER
-// ============================================================
-function renderQuestion() {
-  const q     = round[qIdx];
-  const total = 3;
-  const pct   = Math.round((qIdx / total) * 100);
-
-  document.getElementById('q-prog-lbl').textContent = `Pregunta ${qIdx + 1} de ${total}`;
-  document.getElementById('q-pct').textContent      = pct + '%';
-  document.getElementById('q-fill').style.width     = pct + '%';
-  document.getElementById('q-num').textContent      = `PREGUNTA ${qIdx + 1}`;
-  document.getElementById('q-text').textContent     = q.text;
-
-  const grid = document.getElementById('q-opts');
-  grid.className = 'opts-grid' + (q.options.length === 2 ? ' two-opts' : '');
-  grid.innerHTML = '';
-
-  q.options.forEach((opt, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'opt-btn';
-    btn.textContent = opt.text;
-    btn.onclick = () => answer(i);
-    grid.appendChild(btn);
-  });
-}
-
-// ============================================================
-// ANSWER LOGIC
-// ============================================================
-function answer(idx) {
-  const btns = document.querySelectorAll('.opt-btn');
-  btns.forEach(b => { b.disabled = true; b.onclick = null; });
-
-  const q   = round[qIdx];
-  const sel = q.options[idx];
-
-  btns.forEach((btn, i) => {
-    if (q.options[i].correct) btn.classList.add('correct');
-    else if (i === idx)       btn.classList.add('wrong');
-  });
-
-  let delay = 1500;
-  if (!sel.correct) {
-    const correct = q.options.find(o => o.correct);
-    const reveal  = document.getElementById('wrong-reveal');
-    document.getElementById('wrong-reveal-answer').textContent = correct.text;
-    reveal.style.display = 'flex';
-    delay = 2400;
+  user.perfil = PROFILE_LABELS[currentProfile] || '';
+  if (currentProfile === 'negocio') {
+    user.tipoNegocio   = document.getElementById('f-tipo-negocio').value.trim();
+    user.nombreNegocio = document.getElementById('f-nombre-negocio').value.trim();
+  } else if (currentProfile === 'profesional') {
+    user.rubro = document.getElementById('f-rubro').value.trim();
+  } else if (currentProfile === 'influencer') {
+    user.redSocial = document.getElementById('f-red-social').value.trim();
   }
+  buildWheel();
+  goTo('s-roulette');
+}
+
+// ============================================================
+// RULETA
+// ============================================================
+function buildWheel() {
+  const wheel = document.getElementById('wheel');
+  wheelRotation = 0;
+  spinAttempt = 0;
+  spinning = false;
+  wheel.style.transition = 'none';
+  wheel.style.transform = 'rotate(0deg)';
+  const btn = document.getElementById('btn-spin');
+  btn.disabled = false;
+  btn.textContent = '¡GIRAR!';
+  document.getElementById('roulette-sub').textContent = 'Tocá el botón y descubrí tu resultado';
+}
+
+function spinWheel() {
+  if (spinning) return;
+  spinning = true;
+  spinAttempt++;
+  document.getElementById('btn-spin').disabled = true;
+  document.getElementById('roulette-sub').textContent = 'Girando...';
+
+  const probs = spinAttempt === 1 ? SPIN1_PROBS : SPIN2_PROBS;
+  const category = pickCategory(probs);
+  const segment = pickSegment(category);
+
+  const extraSpins = 5 * 360;
+  const finalRotation = wheelRotation - (wheelRotation % 360) + extraSpins + (360 - segment.angle);
+
+  const wheel = document.getElementById('wheel');
+  wheel.style.transition = 'transform 4.5s cubic-bezier(.15,.66,.18,1)';
+  wheel.style.transform = `rotate(${finalRotation}deg)`;
+  wheelRotation = finalRotation;
 
   setTimeout(() => {
-    document.getElementById('wrong-reveal').style.display = 'none';
-    qIdx++;
-    if (qIdx < 3) {
-      renderQuestion();
+    if (category === 'ganaste') {
+      showPrize();
+    } else if (category === 'gracias') {
+      saveLead('Perdió (ruleta)');
+      showNoPrize();
     } else {
-      enterBoxGame();
+      spinning = false;
+      const btn = document.getElementById('btn-spin');
+      btn.disabled = false;
+      btn.textContent = '¡GIRAR DE NUEVO!';
+      document.getElementById('roulette-sub').textContent = '¡Tirá de nuevo!';
     }
-  }, delay);
-}
-
-// ============================================================
-// BOX GAME
-// ============================================================
-function enterBoxGame() {
-  boxSecondChance = false;
-  const isClassic = cfg.boxMode === 'classic';
-  const positions = shuffle([0, 1, 2]);
-  winBoxes = isClassic ? [positions[0]] : [positions[0], positions[1]];
-
-  document.getElementById('boxes-title').textContent = '¡Elegí tu caja!';
-  document.getElementById('boxes-sub').textContent = isClassic
-    ? 'Solo una tiene el premio... ¿Cuál elegís?'
-    : 'Dos de las tres cajas tienen el premio. ¿Cuál elegís?';
-
-  for (let i = 0; i < 3; i++) {
-    const el = document.getElementById('box-' + i);
-    el.className = 'box-card';
-    el.querySelector('.box-lbl').textContent = 'Caja ' + (i + 1);
-    el.onclick = () => pickBox(i);
-  }
-  goTo('s-boxes');
-}
-
-function enterBoxSecondChance() {
-  boxSecondChance = true;
-  winBoxes = [0, 1, 2]; // todas las cajas ganan en la segunda chance
-
-  document.getElementById('boxes-title').textContent = '¡Segunda oportunidad!';
-  document.getElementById('boxes-sub').textContent = 'Elegí una caja y llevate el premio';
-
-  for (let i = 0; i < 3; i++) {
-    const el = document.getElementById('box-' + i);
-    el.className = 'box-card';
-    el.querySelector('.box-lbl').textContent = 'Caja ' + (i + 1);
-    el.onclick = () => pickBox(i);
-  }
-  goTo('s-boxes');
-}
-
-function pickBox(idx) {
-  for (let i = 0; i < 3; i++) {
-    const el = document.getElementById('box-' + i);
-    el.classList.add('disabled');
-    el.onclick = null;
-  }
-
-  const picked = document.getElementById('box-' + idx);
-
-  if (winBoxes.includes(idx)) {
-    picked.classList.add('winner');
-    picked.querySelector('.box-lbl').textContent = '¡Premio!';
-    setTimeout(showPrize, 900);
-  } else {
-    picked.classList.add('loser');
-    picked.querySelector('.box-lbl').textContent = 'Vacía';
-    winBoxes.forEach(wi => {
-      const w = document.getElementById('box-' + wi);
-      w.classList.add('winner');
-      w.querySelector('.box-lbl').textContent = '¡Aquí estaba!';
-    });
-    // En modo evento, primer intento perdido → segunda chance garantizada
-    if (cfg.boxMode !== 'classic' && !boxSecondChance && !prizesExhausted()) {
-      setTimeout(enterBoxSecondChance, 1800);
-    } else {
-      saveLead('Perdió (cajas)');
-      setTimeout(showNoPrize, 1400);
-    }
-  }
+  }, 4700);
 }
 
 function showPrize() {
@@ -1836,8 +1512,8 @@ function showPrize() {
     return;
   }
   recordPrize();
-  saveLead(boxSecondChance ? 'Ganó (2da chance)' : 'Ganó');
-  document.getElementById('prize-name').textContent = cfg.prize.name;
+  saveLead('Ganó');
+  document.getElementById('prize-won-name').textContent = cfg.prize.name;
   document.getElementById('prize-desc').textContent = cfg.prize.description;
   goTo('s-prize');
   startCD('prize-cd-fill', 'prize-cd-lbl', 10, () => { restart(); goTo('s-welcome'); resetIdle(); });
@@ -1887,13 +1563,15 @@ function getLeads() { return JSON.parse(localStorage.getItem('batev_leads') || '
 function saveLead(resultado) {
   const leads = getLeads();
   leads.push({
-    date:      new Date().toLocaleString('es-AR'),
-    nombre:    user.nombre    || '',
-    tel:       user.tel       || '',
-    email:     user.email     || '',
-    profesion: user.profesion || '',
-    empresa:   user.empresa   || '',
-    vendeMeli: user.vendeMeli || '',
+    date:           new Date().toLocaleString('es-AR'),
+    nombre:         user.nombre         || '',
+    tel:            user.tel            || '',
+    email:          user.email          || '',
+    perfil:         user.perfil         || '',
+    tipoNegocio:    user.tipoNegocio    || '',
+    nombreNegocio:  user.nombreNegocio  || '',
+    rubro:          user.rubro          || '',
+    redSocial:      user.redSocial      || '',
     resultado
   });
   localStorage.setItem('batev_leads', JSON.stringify(leads));
@@ -1904,12 +1582,13 @@ function saveLead(resultado) {
 // ============================================================
 function restart() {
   clearInterval(cdInterval);
-  ['f-nombre','f-tel','f-email','f-profesion','f-empresa'].forEach(id => { document.getElementById(id).value = ''; });
-  document.getElementById('yn-si').className = 'yn-btn';
-  document.getElementById('yn-no').className = 'yn-btn';
+  ['f-nombre','f-tel','f-email','f-tipo-negocio','f-nombre-negocio','f-rubro','f-red-social'].forEach(id => { document.getElementById(id).value = ''; });
   document.getElementById('btn-form-next').classList.remove('enabled');
-  vendeMeli = null;
-  user = {}; round = []; qIdx = 0; boxSecondChance = false;
+  document.getElementById('btn-profile-next').classList.remove('enabled');
+  document.querySelectorAll('.profile-opt').forEach(btn => btn.classList.remove('selected'));
+  document.querySelectorAll('.profile-extra').forEach(el => el.style.display = 'none');
+  currentProfile = null;
+  user = {};
 }
 
 // ============================================================
@@ -1935,6 +1614,13 @@ function handleConfigTrigger() {
   }
 }
 
+function leadDetail(l) {
+  if (l.tipoNegocio || l.nombreNegocio) return `${l.tipoNegocio || ''} — ${l.nombreNegocio || ''}`.trim();
+  if (l.rubro) return l.rubro;
+  if (l.redSocial) return l.redSocial;
+  return '';
+}
+
 function openAdmin() {
   clearInterval(cdInterval);
   const leads = getLeads();
@@ -1949,9 +1635,8 @@ function openAdmin() {
       <td>${l.nombre}</td>
       <td>${l.tel}</td>
       <td>${l.email || '—'}</td>
-      <td>${l.profesion || '—'}</td>
-      <td>${l.empresa || '—'}</td>
-      <td>${l.vendeMeli || '—'}</td>
+      <td>${l.perfil || '—'}</td>
+      <td>${leadDetail(l) || '—'}</td>
       <td>${l.resultado}</td>
     `;
     tbody.appendChild(tr);
@@ -1960,7 +1645,6 @@ function openAdmin() {
   document.getElementById('cfg-prize-name').value    = cfg.prize.name;
   document.getElementById('cfg-prize-desc').value    = cfg.prize.description;
   document.getElementById('cfg-idle-timeout').value  = cfg.idleTimeout || 180;
-  document.getElementById('cfg-box-mode').value      = cfg.boxMode || 'event';
   document.getElementById('cfg-daily-limit').value = cfg.dailyLimit;
   document.getElementById('cfg-total-limit').value = cfg.totalLimit;
   document.getElementById('stat-today').textContent     = todayPrizes.count;
@@ -1995,10 +1679,9 @@ function switchTab(tab) {
 }
 
 function saveConfig() {
-  cfg.prize.name        = document.getElementById('cfg-prize-name').value.trim() || '¡Ganaste Merchandising de Mercado Libre!';
+  cfg.prize.name        = document.getElementById('cfg-prize-name').value.trim() || 'Merchandising de Mercado Libre';
   cfg.prize.description = document.getElementById('cfg-prize-desc').value.trim();
   cfg.idleTimeout       = parseInt(document.getElementById('cfg-idle-timeout').value, 10) || 180;
-  cfg.boxMode           = document.getElementById('cfg-box-mode').value;
   cfg.dailyLimit        = parseInt(document.getElementById('cfg-daily-limit').value, 10) || 125;
   cfg.totalLimit        = parseInt(document.getElementById('cfg-total-limit').value, 10) || 499;
   localStorage.setItem('batev_cfg', JSON.stringify(cfg));
@@ -2008,9 +1691,9 @@ function saveConfig() {
 function exportCSV() {
   const leads = getLeads();
   if (!leads.length) { alert('No hay datos para exportar.'); return; }
-  let csv = 'Fecha,Nombre,Teléfono,Email,Profesión,Empresa,Vende en ML,Resultado\n';
+  let csv = 'Fecha,Nombre,Teléfono,Email,Perfil,Tipo de Negocio,Nombre del Negocio,Rubro,Perfil Red Social,Resultado\n';
   leads.forEach(l => {
-    csv += `"${l.date}","${l.nombre}","${l.tel}","${l.email || ''}","${l.profesion || ''}","${l.empresa || ''}","${l.vendeMeli || ''}","${l.resultado}"\n`;
+    csv += `"${l.date}","${l.nombre}","${l.tel}","${l.email || ''}","${l.perfil || ''}","${l.tipoNegocio || ''}","${l.nombreNegocio || ''}","${l.rubro || ''}","${l.redSocial || ''}","${l.resultado}"\n`;
   });
   const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
   const a = document.createElement('a');
@@ -2051,67 +1734,62 @@ document.querySelectorAll('.btn-huge, .btn-primary, .game-select-card').forEach(
 });
 
 // ============================================================
-// QUESTION STAGGER ANIMATION
+// PRIZE INTRO — ráfaga geométrica + reveal (reemplaza el confetti)
 // ============================================================
-function animateQuestion() {
-  const text = document.getElementById('q-text');
-  text.style.animation = 'none';
-  text.offsetHeight; // reflow
-  text.style.animation = 'slideRight .38s ease both';
+function restartCSSAnimation(el) {
+  if (!el) return;
+  el.style.animation = 'none';
+  void el.offsetWidth; // fuerza reflow para poder relanzar la animación
+  el.style.animation = '';
+}
 
-  document.querySelectorAll('.opt-btn').forEach((btn, i) => {
-    btn.style.animation = 'none';
-    btn.offsetHeight;
-    btn.style.animation = `fadeUp .32s ${i * 0.07}s ease both`;
-    btn.addEventListener('pointerdown', addRipple, { once: true });
+function popInLetters(el, staggerMs, delayMs) {
+  const text = el.textContent;
+  el.innerHTML = '';
+  el.setAttribute('aria-label', text);
+  [...text].forEach((ch, i) => {
+    const span = document.createElement('span');
+    span.className = 'pop-char';
+    span.textContent = ch === ' ' ? ' ' : ch;
+    span.style.animationDelay = (delayMs + i * staggerMs) + 'ms';
+    el.appendChild(span);
   });
 }
 
-// ============================================================
-// CONFETTI (prize screen)
-// ============================================================
 function launchConfetti() {
-  const canvas = document.getElementById('confetti-canvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const rect = canvas.getBoundingClientRect();
-  canvas.width  = rect.width  || window.innerWidth;
-  canvas.height = rect.height || window.innerHeight;
-  const pieces = Array.from({ length: 120 }, () => ({
-    x: Math.random() * canvas.width,
-    y: -20 - Math.random() * 200,
-    r: 5 + Math.random() * 7,
-    d: 2 + Math.random() * 4,
-    color: ['#FFE600','#2D3277','#ffffff','#00A650','#FF6B35'][Math.floor(Math.random()*5)],
-    tilt: Math.random() * 10 - 5,
-    tiltSpeed: 0.08 + Math.random() * 0.12,
-    tiltAngle: 0
-  }));
-  let frame;
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    pieces.forEach(p => {
-      p.tiltAngle += p.tiltSpeed;
-      p.y += p.d;
-      p.tilt = Math.sin(p.tiltAngle) * 14;
-      if (p.y > canvas.height) { p.y = -20; p.x = Math.random() * canvas.width; }
-      ctx.beginPath();
-      ctx.lineWidth = p.r;
-      ctx.strokeStyle = p.color;
-      ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
-      ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
-      ctx.stroke();
-    });
-    frame = requestAnimationFrame(draw);
+  const fx = document.getElementById('prize-fx');
+  ['.prize-brand-logo', '.prize-eyebrow', '.prize-won', '.prize-desc']
+    .forEach(sel => restartCSSAnimation(document.querySelector(sel)));
+  popInLetters(document.getElementById('prize-name'), 32, 380);
+
+  if (!fx) return;
+  fx.innerHTML = '';
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const colors = ['var(--navy)', 'var(--white)', 'rgba(45,50,119,0.6)'];
+  const count = 16;
+  for (let i = 0; i < count; i++) {
+    const s = document.createElement('span');
+    s.className = 'spark';
+    const angle = (360 / count) * i + (Math.random() * 16 - 8);
+    const dist  = 120 + Math.random() * 100;
+    const delay = Math.random() * 140;
+    s.style.setProperty('--r', angle + 'deg');
+    s.style.setProperty('--dist', -dist + 'px');
+    s.style.setProperty('--d', delay + 'ms');
+    s.style.setProperty('--c', colors[i % colors.length]);
+    if (Math.random() < 0.35) {
+      s.style.setProperty('--w', '8px');
+      s.style.setProperty('--h', '8px');
+      s.style.borderRadius = '50%';
+    }
+    fx.appendChild(s);
   }
-  if (frame) cancelAnimationFrame(frame);
-  draw();
-  canvas._stopConfetti = () => { cancelAnimationFrame(frame); ctx.clearRect(0,0,canvas.width,canvas.height); };
 }
 
 function stopConfetti() {
-  const canvas = document.getElementById('confetti-canvas');
-  if (canvas && canvas._stopConfetti) canvas._stopConfetti();
+  const fx = document.getElementById('prize-fx');
+  if (fx) fx.innerHTML = '';
 }
 
 // ── Wrap core functions with animation logic ──────────────────
@@ -2123,40 +1801,7 @@ function stopConfetti() {
     _core(id);
     const backBtn = document.getElementById('btn-back-home');
     if (backBtn) backBtn.style.display = (id === 's-form') ? 'flex' : 'none';
-    if (id === 's-question') setTimeout(animateQuestion, 60);
-    if (id === 's-prize')    setTimeout(launchConfetti, 400);
-    if (id === 's-boxes') {
-      setTimeout(() => {
-        document.querySelectorAll('.box-card').forEach((c,i) => {
-          c.style.animation = 'none'; c.offsetHeight;
-          c.style.animation = `fadeUp .4s ${i*0.12}s ease both`;
-          setTimeout(() => c.classList.add('floating'), 600 + i*120);
-        });
-      }, 80);
-    }
-  };
-
-  // renderQuestion → stagger options after render
-  const _rq = renderQuestion;
-  renderQuestion = function() { _rq(); setTimeout(animateQuestion, 30); };
-
-  // enterBoxGame / enterBoxSecondChance → clear float classes first
-  const _ebg = enterBoxGame;
-  enterBoxGame = function() {
-    document.querySelectorAll('.box-card').forEach(c => c.classList.remove('floating'));
-    _ebg();
-  };
-  const _ebsc = enterBoxSecondChance;
-  enterBoxSecondChance = function() {
-    document.querySelectorAll('.box-card').forEach(c => c.classList.remove('floating'));
-    _ebsc();
-  };
-
-  // pickBox → stop float on pick
-  const _pb = pickBox;
-  pickBox = function(idx) {
-    document.querySelectorAll('.box-card').forEach(c => c.classList.remove('floating'));
-    _pb(idx);
+    if (id === 's-prize') setTimeout(launchConfetti, 400);
   };
 
   // startCD → add urgent class when ≤ 3s remain
