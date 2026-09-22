@@ -359,6 +359,7 @@ input, textarea { user-select: text; -webkit-user-select: text; }
 }
 .profile-opt:active { transform: scale(0.98); }
 .profile-opt.selected { border-color: var(--navy); background: var(--navy); color: var(--white); }
+.profile-opt.hidden-opt { display: none; }
 
 .profile-extra {
   display: flex;
@@ -1423,9 +1424,24 @@ function goToProfile() {
 // PROFILE — paso 2
 // ============================================================
 function selectProfile(key) {
+  if (currentProfile === key) {
+    // tocar de nuevo la opción elegida = deshacer selección
+    currentProfile = null;
+    document.querySelectorAll('.profile-opt').forEach(btn => {
+      btn.classList.remove('selected', 'hidden-opt');
+    });
+    document.getElementById('extra-negocio').style.display     = 'none';
+    document.getElementById('extra-profesional').style.display = 'none';
+    document.getElementById('extra-influencer').style.display  = 'none';
+    checkProfileForm();
+    return;
+  }
+
   currentProfile = key;
   document.querySelectorAll('.profile-opt').forEach(btn => {
-    btn.classList.toggle('selected', btn.dataset.profile === key);
+    const isMatch = btn.dataset.profile === key;
+    btn.classList.toggle('selected', isMatch);
+    btn.classList.toggle('hidden-opt', !isMatch);
   });
   document.getElementById('extra-negocio').style.display     = key === 'negocio'     ? 'flex' : 'none';
   document.getElementById('extra-profesional').style.display = key === 'profesional' ? 'flex' : 'none';
@@ -1602,7 +1618,7 @@ function restart() {
   ['f-nombre','f-tel','f-email','f-tipo-negocio','f-nombre-negocio','f-rubro','f-red-social'].forEach(id => { document.getElementById(id).value = ''; });
   document.getElementById('btn-form-next').classList.remove('enabled');
   document.getElementById('btn-profile-next').classList.remove('enabled');
-  document.querySelectorAll('.profile-opt').forEach(btn => btn.classList.remove('selected'));
+  document.querySelectorAll('.profile-opt').forEach(btn => btn.classList.remove('selected', 'hidden-opt'));
   document.querySelectorAll('.profile-extra').forEach(el => el.style.display = 'none');
   currentProfile = null;
   user = {};
