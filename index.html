@@ -148,13 +148,13 @@ input, textarea { user-select: text; -webkit-user-select: text; }
   align-items: center;
   justify-content: center;
   gap: 3vh;
-  background: var(--navy);
+  background: var(--yellow);
 }
 .ss-fallback-logo { font-size: clamp(80px, 15vh, 160px); }
 .ss-fallback-text {
   font-size: clamp(20px, 3.5vh, 40px);
   font-weight: 900;
-  color: var(--yellow);
+  color: var(--navy);
   letter-spacing: -0.5px;
 }
 .ss-tap-hint {
@@ -366,6 +366,22 @@ input, textarea { user-select: text; -webkit-user-select: text; }
   gap: 1.8vh;
   animation: fadeUp .3s ease both;
 }
+.profile-extra .field input {
+  border-color: var(--yellow);
+  background: #FFFCE0;
+  box-shadow: 0 0 0 4px rgba(255, 230, 0, 0.3);
+  animation: fieldHighlightPop .4s ease both;
+}
+.profile-extra .field input:focus {
+  border-color: var(--navy);
+  background: var(--white);
+  box-shadow: 0 0 0 4px rgba(45, 50, 119, 0.12);
+}
+@keyframes fieldHighlightPop {
+  0%   { transform: scale(0.97); }
+  60%  { transform: scale(1.015); }
+  100% { transform: scale(1); }
+}
 
 /* ================================================================
    RESULT SCREENS (shared classes used by s-noprize)
@@ -375,15 +391,15 @@ input, textarea { user-select: text; -webkit-user-select: text; }
 .result-big-title {
   font-size: clamp(40px, 8vh, 96px);
   font-weight: 900;
-  color: var(--white);
+  color: var(--navy);
   letter-spacing: -1.5px;
   line-height: 1.0;
   flex-shrink: 0;
 }
 .result-sub {
   font-size: clamp(15px, 2.4vh, 28px);
-  font-weight: 500;
-  color: rgba(255,255,255,0.55);
+  font-weight: 700;
+  color: rgba(0,0,0,0.55);
   line-height: 1.5;
   flex-shrink: 0;
 }
@@ -711,6 +727,7 @@ input, textarea { user-select: text; -webkit-user-select: text; }
   }
   .prize-title .pop-char { opacity: 1 !important; transform: none !important; animation: none !important; }
   .prize-fx { display: none; }
+  .profile-extra .field input { animation: none !important; transform: none !important; }
 }
 @keyframes prizeFadeSimple { to { opacity: 1; } }
 
@@ -718,7 +735,7 @@ input, textarea { user-select: text; -webkit-user-select: text; }
    NO PRIZE (lost boxes)
 ================================================================ */
 #s-noprize {
-  background: var(--navy);
+  background: var(--yellow);
   align-items: center;
   justify-content: center;
   padding: 7vh 10vw;
@@ -1095,12 +1112,12 @@ input, textarea { user-select: text; -webkit-user-select: text; }
 <div class="screen" id="s-noprize">
   <div class="result-icon">🎁</div>
   <div class="result-big-title">¡Gracias por<br>participar!</div>
-  <p class="result-sub">Esta vez el premio estuvo en otra caja.<br>¡Seguí participando!</p>
+  <p class="result-sub">Esta vez la ruleta no te dio premio.<br>¡Seguí participando!</p>
 
   <div class="countdown-wrap">
-    <div class="countdown-lbl" id="noprize-cd-lbl">Volviendo al inicio...</div>
-    <div class="countdown-track">
-      <div class="countdown-fill" id="noprize-cd-fill"></div>
+    <div class="countdown-lbl dark" id="noprize-cd-lbl">Volviendo al inicio...</div>
+    <div class="countdown-track light">
+      <div class="countdown-fill navy" id="noprize-cd-fill"></div>
     </div>
   </div>
 </div>
