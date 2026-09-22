@@ -614,14 +614,6 @@ input, textarea { user-select: text; -webkit-user-select: text; }
   transition: transform 4.5s cubic-bezier(.15,.66,.18,1);
 }
 
-#btn-spin {
-  width: clamp(340px, 38vw, 480px);
-  font-size: clamp(14px, 2.6vh, 30px);
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 #btn-spin:disabled { opacity: 0.55; box-shadow: none; cursor: default; }
 
 /* ================================================================
@@ -1551,7 +1543,7 @@ function spinWheel() {
       spinning = false;
       const btn = document.getElementById('btn-spin');
       btn.disabled = false;
-      btn.textContent = '¡TIRÁ DE NUEVO!';
+      btn.textContent = '¡GIRAR DE NUEVO!';
       document.getElementById('roulette-sub').textContent = '¡Tirá de nuevo!';
     }
   }, 4700);
