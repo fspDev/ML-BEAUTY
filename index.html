@@ -1223,10 +1223,11 @@ const WHEEL_SEGMENTS = [
   { angle: 315, result: 'gracias' }   // verde-amarillo
 ];
 
-// Probabilidades del 1er giro: la mayoría cae en "tirá de nuevo"
-const SPIN1_PROBS = { tira: 0.75, ganaste: 0.20, gracias: 0.05 };
-// Probabilidades del 2do giro (si tocó "tirá de nuevo"): casi siempre premio
-const SPIN2_PROBS = { ganaste: 0.93, gracias: 0.07 };
+// Probabilidades del 1er giro: la mayoría cae en "tirá de nuevo".
+// "Gracias por participar" nunca sale: todos los giros terminan en premio.
+const SPIN1_PROBS = { tira: 0.85, ganaste: 0.15 };
+// 2do giro (si tocó "tirá de nuevo"): siempre premio
+const SPIN2_PROBS = { ganaste: 1 };
 
 function pickCategory(probs) {
   const r = Math.random();
