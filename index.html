@@ -270,6 +270,12 @@ input, textarea { user-select: text; -webkit-user-select: text; }
   text-align: center;
   margin-bottom: 2vh;
 }
+#roulette-sub {
+  min-height: clamp(40px, 5.6vh, 68px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .form-fields {
   width: 100%;
@@ -1543,7 +1549,7 @@ function spinWheel() {
       spinning = false;
       const btn = document.getElementById('btn-spin');
       btn.disabled = false;
-      btn.textContent = '¡GIRAR DE NUEVO!';
+      btn.textContent = '¡GIRAR!';
       document.getElementById('roulette-sub').textContent = '¡Tirá de nuevo!';
     }
   }, 4700);
