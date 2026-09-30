@@ -85,15 +85,6 @@ input, textarea { user-select: text; -webkit-user-select: text; }
   background: rgba(45,50,119,0.2);
   flex-shrink: 0;
 }
-.logo-suffix {
-  font-weight: 800;
-  color: var(--navy);
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-#s-welcome .logo-suffix { font-size: clamp(20px, 4.5vh, 52px); }
 
 .welcome-tagline {
   font-size: clamp(18px, 3vh, 38px);
@@ -246,7 +237,6 @@ input, textarea { user-select: text; -webkit-user-select: text; }
 }
 .top-logos .logo-img { height: clamp(32px, 5vh, 60px); }
 .top-logos .logo-divider { height: clamp(26px, 4vh, 52px); background: var(--border); }
-.top-logos .logo-suffix { font-size: clamp(13px, 2vh, 24px); }
 
 .section-eyebrow {
   font-size: clamp(12px, 1.6vh, 18px);
@@ -657,18 +647,14 @@ input, textarea { user-select: text; -webkit-user-select: text; }
   gap: 3vh;
 }
 .prize-brand-logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(10px, 1.6vw, 20px);
+  width: clamp(220px, 52vw, 640px);
+  height: auto;
+  display: block;
   filter: drop-shadow(0 6px 24px rgba(45,50,119,0.18));
   opacity: 0;
   transform: scale(0.92);
   animation: prizeLogoIn 550ms var(--ease-out) 80ms both;
 }
-.prize-brand-logo img { width: clamp(180px, 40vw, 460px); height: auto; display: block; }
-.prize-brand-logo .logo-divider { height: clamp(30px, 5vh, 70px); background: rgba(45,50,119,0.25); }
-.prize-brand-logo .logo-suffix { font-size: clamp(18px, 3.6vh, 44px); }
 .prize-eyebrow {
   font-size: clamp(13px, 2vh, 22px);
   font-weight: 700;
@@ -971,11 +957,7 @@ input, textarea { user-select: text; -webkit-user-select: text; }
   <video id="ss-video" src="video/screensaver.mp4" loop playsinline muted
          onerror="document.getElementById('ss-fallback').style.display='flex'; this.style.display='none'"></video>
   <div class="ss-fallback" id="ss-fallback" style="display:none;">
-    <div style="display:flex; align-items:center; justify-content:center; gap:clamp(10px,1.6vw,20px);">
-      <img src="images/logo-ml.svg" alt="Mercado Libre" style="max-width:clamp(160px,30vw,320px); max-height:clamp(80px,18vh,180px); object-fit:contain;">
-      <span class="logo-divider" style="background:rgba(45,50,119,0.35);"></span>
-      <span class="logo-suffix" style="font-size:clamp(16px,3vh,32px);">Belleza</span>
-    </div>
+    <img src="images/logo-ml.svg" alt="Mercado Libre Belleza" style="max-width:clamp(160px,30vw,320px); max-height:clamp(80px,18vh,180px); object-fit:contain;">
   </div>
   <div class="ss-tap-hint">Tocá para continuar</div>
   <div class="ss-controls" onclick="event.stopPropagation()" onpointerdown="event.stopPropagation()">
@@ -995,9 +977,7 @@ input, textarea { user-select: text; -webkit-user-select: text; }
 ============================================================ -->
 <div class="screen active" id="s-welcome">
   <button class="welcome-logo-btn anim-welcome-logos" onclick="logoTap()">
-    <img class="logo-img" src="images/logo-ml.svg" alt="Mercado Libre">
-    <span class="logo-divider"></span>
-    <span class="logo-suffix">Belleza</span>
+    <img class="logo-img" src="images/logo-ml.svg" alt="Mercado Libre Belleza">
   </button>
 
   <p class="welcome-tagline anim-welcome-eye">
@@ -1015,9 +995,7 @@ input, textarea { user-select: text; -webkit-user-select: text; }
 ============================================================ -->
 <div class="screen" id="s-form">
   <div class="top-logos">
-    <img class="logo-img" src="images/logo-ml.svg" alt="ML">
-    <span class="logo-divider"></span>
-    <span class="logo-suffix">Belleza</span>
+    <img class="logo-img" src="images/logo-ml.svg" alt="Mercado Libre Belleza">
   </div>
 
   <div class="section-title">Tus datos</div>
@@ -1046,9 +1024,7 @@ input, textarea { user-select: text; -webkit-user-select: text; }
 ============================================================ -->
 <div class="screen" id="s-profile">
   <div class="top-logos">
-    <img class="logo-img" src="images/logo-ml.svg" alt="ML">
-    <span class="logo-divider"></span>
-    <span class="logo-suffix">Belleza</span>
+    <img class="logo-img" src="images/logo-ml.svg" alt="Mercado Libre Belleza">
   </div>
 
   <div class="section-title">Tu perfil</div>
@@ -1099,9 +1075,7 @@ input, textarea { user-select: text; -webkit-user-select: text; }
 ============================================================ -->
 <div class="screen" id="s-roulette">
   <div class="top-logos">
-    <img class="logo-img" src="images/logo-ml.svg" alt="ML">
-    <span class="logo-divider"></span>
-    <span class="logo-suffix">Belleza</span>
+    <img class="logo-img" src="images/logo-ml.svg" alt="Mercado Libre Belleza">
   </div>
 
   <div class="roulette-main">
@@ -1124,11 +1098,7 @@ input, textarea { user-select: text; -webkit-user-select: text; }
 <div class="screen" id="s-prize" onclick="stopConfetti(); restart(); goTo('s-welcome'); resetIdle();">
 <div id="prize-fx" class="prize-fx"></div>
   <div class="prize-main" style="position:relative;z-index:1;">
-    <div class="prize-brand-logo">
-      <img src="images/logo-ml.svg" alt="Mercado Libre">
-      <span class="logo-divider"></span>
-      <span class="logo-suffix">Belleza</span>
-    </div>
+    <img class="prize-brand-logo" src="images/logo-ml.svg" alt="Mercado Libre Belleza">
     <div class="prize-eyebrow">¡Felicitaciones!</div>
     <div class="prize-title" id="prize-name">¡Ganaste!</div>
     <p class="prize-desc" id="prize-desc">Acercate al stand para reclamar tu premio.</p>
