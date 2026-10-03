@@ -908,6 +908,77 @@ input, textarea { user-select: text; -webkit-user-select: text; }
 /* Countdown pulse when low */
 .countdown-fill.urgent { animation: countdownPulse .7s ease-in-out infinite; }
 
+/* ================================================================
+   TECLADO EN PANTALLA (TV táctil: el de Windows no aparece)
+================================================================ */
+.kb {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  z-index: 900;
+  background: #E4E5EC;
+  border-top: 1px solid #d0d2dc;
+  padding: clamp(8px, 1.2vh, 18px) clamp(8px, 2vw, 60px) clamp(10px, 1.6vh, 24px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(6px, 0.9vh, 12px);
+  transform: translateY(105%);
+  visibility: hidden;
+  transition: transform .32s var(--ease-out), visibility 0s .32s;
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.08);
+}
+.kb.open { transform: translateY(0); visibility: visible; transition: transform .32s var(--ease-out), visibility 0s; }
+.kb-row { display: flex; gap: clamp(5px, 0.5vw, 10px); width: 100%; max-width: 1500px; justify-content: center; }
+.kb.numeric .kb-row { max-width: 640px; }
+.kb-key {
+  flex: 1 1 0;
+  min-width: 0;
+  height: clamp(44px, 6.2vh, 84px);
+  border: none;
+  border-radius: 10px;
+  background: var(--white);
+  color: var(--navy);
+  font-family: inherit;
+  font-size: clamp(17px, 3vh, 40px);
+  font-weight: 700;
+  box-shadow: 0 2px 0 rgba(45,50,119,0.18);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .06s, background .06s;
+  white-space: nowrap;
+  touch-action: manipulation;
+}
+.kb-key.pressed { transform: translateY(2px) scale(0.97); background: #D6D8E6; box-shadow: none; }
+.kb-key.w15 { flex-grow: 1.5; }
+.kb-key.w2  { flex-grow: 2; }
+.kb-key.w3  { flex-grow: 3; }
+.kb-key.w6  { flex-grow: 6; }
+.kb-key.small { font-size: clamp(13px, 2.1vh, 28px); }
+.kb-key.dark { background: #C9CBD8; }
+.kb-key.dark.on { background: var(--navy); color: var(--white); }
+.kb-key.go { background: var(--navy); color: var(--white); font-size: clamp(15px, 2.4vh, 32px); font-weight: 800; }
+.kb-key.go.pressed { background: #1f2360; }
+.kb-key svg { width: 1.15em; height: 1.15em; }
+.kb-hide {
+  position: absolute;
+  top: 0;
+  right: clamp(8px, 2vw, 60px);
+  transform: translateY(-100%);
+  background: #E4E5EC;
+  border: 1px solid #d0d2dc;
+  border-bottom: none;
+  color: var(--navy);
+  font-family: inherit;
+  font-size: clamp(12px, 1.6vh, 20px);
+  font-weight: 700;
+  padding: 0.55em 1.2em;
+  border-radius: 10px 10px 0 0;
+  cursor: pointer;
+}
+.screen.kb-pad { justify-content: flex-start !important; }
+
 /* Hover lift on game-select cards */
 @media (hover:hover) {
   .game-select-card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(45,50,119,.15); }
@@ -1010,15 +1081,15 @@ input, textarea { user-select: text; -webkit-user-select: text; }
 
   <div class="form-fields">
     <div class="field">
-      <input type="text" id="f-nombre" placeholder=" " oninput="checkForm()" autocomplete="off" inputmode="text" autocapitalize="words">
+      <input type="text" id="f-nombre" placeholder=" " oninput="checkForm()" autocomplete="off" inputmode="none" data-kb="text">
       <label for="f-nombre">Nombre</label>
     </div>
     <div class="field">
-      <input type="tel" id="f-tel" placeholder=" " oninput="checkForm()" autocomplete="off" inputmode="tel">
+      <input type="tel" id="f-tel" placeholder=" " oninput="checkForm()" autocomplete="off" inputmode="none" data-kb="number">
       <label for="f-tel">Teléfono</label>
     </div>
     <div class="field">
-      <input type="email" id="f-email" placeholder=" " oninput="checkForm()" autocomplete="off" inputmode="email" autocapitalize="off" autocorrect="off">
+      <input type="text" id="f-email" placeholder=" " oninput="checkForm()" autocomplete="off" inputmode="none" autocapitalize="off" autocorrect="off" data-kb="email">
       <label for="f-email">Mail</label>
     </div>
     <button class="btn-primary" id="btn-form-next" onclick="goToProfile()">Continuar →</button>
@@ -1049,25 +1120,25 @@ input, textarea { user-select: text; -webkit-user-select: text; }
 
     <div class="profile-extra" id="extra-negocio" style="display:none;">
       <div class="field">
-        <input type="text" id="f-tipo-negocio" placeholder=" " oninput="checkProfileForm()" autocomplete="off" inputmode="text" autocapitalize="sentences">
+        <input type="text" id="f-tipo-negocio" placeholder=" " oninput="checkProfileForm()" autocomplete="off" inputmode="none" data-kb="text">
         <label for="f-tipo-negocio">Tipo de negocio</label>
       </div>
       <div class="field">
-        <input type="text" id="f-nombre-negocio" placeholder=" " oninput="checkProfileForm()" autocomplete="off" inputmode="text" autocapitalize="words">
+        <input type="text" id="f-nombre-negocio" placeholder=" " oninput="checkProfileForm()" autocomplete="off" inputmode="none" data-kb="text">
         <label for="f-nombre-negocio">Nombre del negocio</label>
       </div>
     </div>
 
     <div class="profile-extra" id="extra-profesional" style="display:none;">
       <div class="field">
-        <input type="text" id="f-rubro" placeholder=" " oninput="checkProfileForm()" autocomplete="off" inputmode="text" autocapitalize="sentences">
+        <input type="text" id="f-rubro" placeholder=" " oninput="checkProfileForm()" autocomplete="off" inputmode="none" data-kb="text">
         <label for="f-rubro">Rubro</label>
       </div>
     </div>
 
     <div class="profile-extra" id="extra-influencer" style="display:none;">
       <div class="field">
-        <input type="text" id="f-red-social" placeholder=" " oninput="checkProfileForm()" autocomplete="off" inputmode="text" autocapitalize="off">
+        <input type="text" id="f-red-social" placeholder=" " oninput="checkProfileForm()" autocomplete="off" inputmode="none" autocapitalize="off" data-kb="handle">
         <label for="f-red-social">Perfil red social</label>
       </div>
     </div>
@@ -1210,6 +1281,8 @@ input, textarea { user-select: text; -webkit-user-select: text; }
     </div>
   </div>
 </div>
+
+<div class="kb" id="kb"></div>
 
 </div><!-- .app -->
 
@@ -1464,6 +1537,8 @@ function selectProfile(key) {
   document.getElementById('extra-influencer').style.display  = key === 'influencer'  ? 'flex' : 'none';
   document.getElementById('btn-change-profile').style.display = 'block';
   checkProfileForm();
+  const extra = document.getElementById('extra-' + key);
+  if (extra) Keyboard.focusFirstIn(extra);
 }
 
 function checkProfileForm() {
@@ -1848,6 +1923,8 @@ function stopConfetti() {
   const _core = goTo;
   goTo = function(id) {
     stopConfetti();
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    Keyboard.hide();
     _core(id);
     const backBtn = document.getElementById('btn-back-home');
     if (backBtn) backBtn.style.display = (id === 's-form') ? 'flex' : 'none';
@@ -1868,10 +1945,211 @@ function stopConfetti() {
 }());
 
 // ============================================================
+// TECLADO EN PANTALLA
+// Los inputs usan inputmode="none" para que no aparezca el de Windows;
+// el teclado físico sigue funcionando normalmente.
+// ============================================================
+const Keyboard = (() => {
+  const ICON_BACK  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 5H9l-7 7 7 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z"/><path d="M17 9l-6 6M11 9l6 6"/></svg>';
+  const ICON_SHIFT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3l9 9h-5v8H8v-8H3z"/></svg>';
+
+  const DIGITS = '1234567890'.split('');
+  const Q = 'qwertyuiop'.split('');
+  const A = 'asdfghjklñ'.split('');
+  const Z = 'zxcvbnm'.split('');
+
+  const LAYOUTS = {
+    text: [
+      DIGITS, Q, A,
+      [{ t: 'shift', cls: 'dark w15' }, ...Z, { t: 'back', cls: 'dark w15' }],
+      [{ t: 'accent', label: '´ tilde', cls: 'dark w2 small' }, { t: 'space', label: 'espacio', cls: 'w6' }, '-', { t: 'next', cls: 'go w3' }]
+    ],
+    email: [
+      DIGITS, Q, A,
+      [...Z, '_', '-', { t: 'back', cls: 'dark w15' }],
+      ['@', '.', { t: 'str', v: '@gmail.com', cls: 'w2 small' }, { t: 'str', v: '@hotmail.com', cls: 'w2 small' }, { t: 'str', v: '.com', cls: 'w15 small' }, { t: 'next', cls: 'go w3' }]
+    ],
+    handle: [
+      DIGITS, Q, A,
+      [...Z, { t: 'back', cls: 'dark w15' }],
+      ['@', '.', '_', { t: 'next', cls: 'go w3' }]
+    ],
+    number: [
+      ['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'],
+      [{ t: 'back', cls: 'dark' }, '0', { t: 'next', cls: 'go' }]
+    ]
+  };
+  const ACCENTS = { a: 'á', e: 'é', i: 'í', o: 'ó', u: 'ú', A: 'Á', E: 'É', I: 'Í', O: 'Ó', U: 'Ú' };
+
+  let el, input = null, layout = null, shift = false, accent = false, repeatT, repeatI, padded = null;
+
+  function visibleInputs() {
+    const scr = document.querySelector('.screen.active');
+    if (!scr) return [];
+    return [...scr.querySelectorAll('input[data-kb]')].filter(i => i.offsetParent !== null);
+  }
+  const nextInput = inp => { const l = visibleInputs(); return l[l.indexOf(inp) + 1] || null; };
+
+  function init() {
+    el = document.getElementById('kb');
+    // Nunca robar el foco del input
+    el.addEventListener('mousedown', e => e.preventDefault());
+    el.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      const key = e.target.closest('.kb-key, .kb-hide');
+      if (!key) return;
+      if (key.classList.contains('kb-hide')) { if (input) input.blur(); hide(); return; }
+      key.classList.add('pressed');
+      setTimeout(() => key.classList.remove('pressed'), 110);
+      press(key.dataset);
+      if (key.dataset.t === 'back') {
+        clearTimeout(repeatT); clearInterval(repeatI);
+        repeatT = setTimeout(() => { repeatI = setInterval(() => press(key.dataset), 65); }, 420);
+      }
+    });
+    const stop = () => { clearTimeout(repeatT); clearInterval(repeatI); };
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => el.addEventListener(ev, stop));
+
+    document.addEventListener('focusin', e => {
+      const t = e.target;
+      if (t.matches && t.matches('input[data-kb]')) attach(t);
+    });
+    document.addEventListener('focusout', () => {
+      setTimeout(() => {
+        const a = document.activeElement;
+        if (!a || !a.matches || !a.matches('input[data-kb]')) hide();
+      }, 60);
+    });
+  }
+
+  function attach(inp) {
+    const wasOpen = el.classList.contains('open');
+    input = inp;
+    const name = inp.dataset.kb;
+    accent = false;
+    shift = name === 'text' && autoShift();
+    if (layout !== name) { layout = name; render(); } else refreshCase();
+    el.classList.toggle('numeric', name === 'number');
+    refreshNext();
+    if (!wasOpen) el.classList.add('open');
+    makeRoom(inp);
+  }
+
+  // Deja espacio abajo para que el teclado no tape el campo activo
+  function makeRoom(inp) {
+    const scr = inp.closest('.screen');
+    if (!scr) return;
+    if (padded && padded !== scr) { padded.classList.remove('kb-pad'); padded.style.paddingBottom = ''; }
+    padded = scr;
+    scr.classList.add('kb-pad');
+    scr.style.paddingBottom = (el.offsetHeight + 24) + 'px';
+    setTimeout(() => {
+      const f = inp.closest('.field') || inp;
+      const r = f.getBoundingClientRect();
+      const limit = window.innerHeight - el.offsetHeight - 16;
+      if (r.bottom > limit) scr.scrollBy({ top: r.bottom - limit, behavior: 'smooth' });
+      else if (r.top < 8) scr.scrollBy({ top: r.top - 8, behavior: 'smooth' });
+    }, 60);
+  }
+
+  function refreshNext() {
+    const nextKey = el.querySelector('[data-t="next"]');
+    if (nextKey && input) nextKey.textContent = nextInput(input) ? 'Siguiente' : 'Listo';
+  }
+
+  function hide() {
+    if (!el || !el.classList.contains('open')) return;
+    el.classList.remove('open');
+    input = null;
+    if (padded) { padded.classList.remove('kb-pad'); padded.style.paddingBottom = ''; padded = null; }
+  }
+
+  function render() {
+    const rows = LAYOUTS[layout];
+    el.innerHTML = '<button class="kb-hide" tabindex="-1">Ocultar teclado ▾</button>' + rows.map(row =>
+      '<div class="kb-row">' + row.map(k => {
+        if (typeof k === 'string') return `<button class="kb-key" tabindex="-1" data-t="char" data-v="${k}">${k}</button>`;
+        let label = k.label || k.v || '';
+        if (k.t === 'back') label = ICON_BACK;
+        if (k.t === 'shift') label = ICON_SHIFT;
+        if (k.t === 'next') label = 'Siguiente';
+        return `<button class="kb-key ${k.cls || ''}" tabindex="-1" data-t="${k.t}" data-v="${k.v || ''}">${label}</button>`;
+      }).join('') + '</div>'
+    ).join('');
+    refreshCase();
+  }
+
+  function refreshCase() {
+    el.querySelectorAll('[data-t="char"]').forEach(b => {
+      const v = b.dataset.v;
+      b.textContent = shift && layout === 'text' ? v.toUpperCase() : v;
+    });
+    const s = el.querySelector('[data-t="shift"]');
+    if (s) s.classList.toggle('on', shift);
+    const a = el.querySelector('[data-t="accent"]');
+    if (a) a.classList.toggle('on', accent);
+  }
+
+  // Mayúscula automática al empezar cada palabra
+  function autoShift() {
+    if (!input) return false;
+    const pos = input.selectionStart ?? input.value.length;
+    return pos === 0 || /\s$/.test(input.value.slice(0, pos));
+  }
+
+  function insert(text) {
+    const s = input.selectionStart ?? input.value.length;
+    const e = input.selectionEnd ?? input.value.length;
+    input.setRangeText(text, s, e, 'end');
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  function backspace() {
+    const s = input.selectionStart ?? input.value.length;
+    const e = input.selectionEnd ?? input.value.length;
+    if (s !== e) input.setRangeText('', s, e, 'end');
+    else if (s > 0) input.setRangeText('', s - 1, s, 'end');
+    else return;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  function press(d) {
+    if (!input) return;
+    switch (d.t) {
+      case 'char': {
+        let c = shift && layout === 'text' ? d.v.toUpperCase() : d.v;
+        if (accent && ACCENTS[c]) c = ACCENTS[c];
+        accent = false;
+        insert(c);
+        break;
+      }
+      case 'str':    insert(d.v); break;
+      case 'space':  insert(' '); break;
+      case 'back':   backspace(); break;
+      case 'shift':  shift = !shift; refreshCase(); return;
+      case 'accent': accent = !accent; refreshCase(); return;
+      case 'next': {
+        const n = nextInput(input);
+        if (n) n.focus(); else { input.blur(); hide(); }
+        return;
+      }
+    }
+    if (layout === 'text') shift = autoShift();
+    refreshCase();
+  }
+
+  return { init, hide, focusFirstIn(container) {
+    const i = container && container.querySelector('input[data-kb]');
+    if (i) setTimeout(() => i.focus(), 350);
+  } };
+})();
+
+// ============================================================
 // INIT
 // ============================================================
 resetIdle();
 initSSControls();
+Keyboard.init();
 </script>
 </body>
 </html>
